@@ -8,7 +8,7 @@ app = FastAPI(
     version="0.0.1",
 )
 # On inclut le routeur d'authentification dans notre application principale
-# app.include_router(auth.router) 
+app.include_router(auth.router) 
 @app.on_event("startup")
 def on_startup():
     init_db()

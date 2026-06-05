@@ -44,3 +44,23 @@ def update(db: Session, db_user: User, user_update: UserUpdate) -> User:
 def delete(db: Session, db_user: User) -> None:
     db.delete(db_user)
     db.commit()
+
+def authenticate_user(db: Session, email: str, password: str) -> User | None:
+    """
+    Vérifie les identifiants d'un utilisateur.
+    Retourne l'objet User si le mot de passe correspond, sinon None.
+    """
+    # 1. Récupérer l'utilisateur par son email
+    db_user = get_by_email(db, email=email)
+    if not db_user:
+        return None  # L'email n'existe pas
+        
+    # 2. Encodage en bytes pour la comparaison bcrypt (indispensable pour éviter les bugs de types)
+    password_bytes = password.encode('utf-8')
+    hashed_db_bytes = db_user.hashed_password.encode('utf-8')
+    
+    # 3. Vérification du mot de passe haché
+    if not bcrypt.checkpw(password_bytes, hashed_db_bytes):
+        return None  # Mauvais mot de passe
+        
+    return db_user
