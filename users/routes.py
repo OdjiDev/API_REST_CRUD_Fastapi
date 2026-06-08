@@ -3,8 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 from typing import List
 from database.session import get_session
+from users.models import User
 from users.schemas import UserCreate, UserResponse, UserUpdate
 from users import services
+
+from users.schemas import UserResponse  #  schéma de sortie propre
+from routers.auth import get_current_user  #  ON IMPORTE LE GARDIEN ICI
 
 router = APIRouter(
     prefix="/users",
@@ -18,11 +22,22 @@ def create_user(user_in: UserCreate, db: Session = Depends(get_session)):
     if db_user:
         raise HTTPException(status_code=400, detail="Cet email est déjà utilisé.")
     return services.create(db, user_in)
-
-# 2. LIRE TOUS
+#  ROUTE PROTÉGÉE : Seuls les utilisateurs connectés avec un JWT valide peuvent y accéder
 @router.get("/", response_model=List[UserResponse])
-def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_session)):
-    return services.get_all(db, skip=skip, limit=limit)
+def read_users(
+    db: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user)  #  LA PROTECTION EST ICI !
+):
+    """
+    Récupère la liste de tous les utilisateurs.
+    FastAPI va automatiquement intercepter la requête, valider le Token JWT, 
+    et injecter l'utilisateur connecté dans la variable 'current_user'.
+    """
+    return services.get_all(db)
+# 2. LIRE TOUS
+# @router.get("/", response_model=List[UserResponse])
+# def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_session)):
+#     return services.get_all(db, skip=skip, limit=limit)
 
 # 3. LIRE UN SEUL
 @router.get("/{user_id}", response_model=UserResponse)
