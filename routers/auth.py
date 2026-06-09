@@ -75,7 +75,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 def register_user(user_in: UserCreate, db: Session = Depends(get_session)):
     """Route d'inscription publique"""
     # 1. Validation stricte du rôle
-    if user_in.role not in ["student", "teacher"]:
+    if user_in.role not in ["student", "admin","teacher"]:
         raise HTTPException(status_code=400, detail="Le rôle doit être 'student' ou 'teacher'.")
         
     # 2. Vérification de l'existence de l'email
