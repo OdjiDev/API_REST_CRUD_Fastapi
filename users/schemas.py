@@ -6,14 +6,14 @@ class UserCreate(BaseModel):
     email: str
     password: str
     role: str
-    phone: str
+    phone: str | None = None
 
 class UserResponse(BaseModel):
     id: int
     nom:   str
     email: str
     role: str
-    phone: str
+    phone: str | None = None
     is_active: bool
 
 class UserUpdate(BaseModel):
