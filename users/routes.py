@@ -1,6 +1,8 @@
 # users/routes.py
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
+from routers.auth import get_current_user  #CTTE LIGNE
+from users.models import User
 from typing import List
 from database.session import get_session
 from users.schemas import UserCreate, UserResponse, UserUpdate
@@ -11,6 +13,15 @@ router = APIRouter(
     tags=["Utilisateurs"]
 )
 
+# ==========================================
+#  ROUTE PROFIL : L'UTILISATEUR CONNECTÉ
+# ==========================================
+@router.get("/me", response_model=UserResponse)
+def read_user_me(current_user: User = Depends(get_current_user)):
+    """
+    Récupère le profil de l'utilisateur actuellement connecté via son token JWT.
+    """
+    return current_user
 # 1. CRÉER
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def create_user(user_in: UserCreate, db: Session = Depends(get_session)):
