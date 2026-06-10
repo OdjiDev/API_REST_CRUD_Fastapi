@@ -24,8 +24,8 @@ def create(db: Session, user_in: UserCreate) -> User:
     db_user = User(
         email=user_in.email,
         hashed_password=hashed_password,
-        role=user_in.role
-        
+        role=user_in.role,
+        phone=user_in.phone
     )
     db.add(db_user)
     db.commit()
@@ -56,6 +56,8 @@ def authenticate_user(db: Session, email: str, password: str) -> User | None:
     if not db_user:
         return None  # L'email n'existe pas
         
+
+
     # 2. Encodage en bytes pour la comparaison bcrypt (indispensable pour éviter les bugs de types)
     password_bytes = password.encode('utf-8')
     hashed_db_bytes = db_user.hashed_password.encode('utf-8')
