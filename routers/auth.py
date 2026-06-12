@@ -46,7 +46,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except jwt.PyJWTError:
         raise credentials_exception
         
-    db_user = services.get_by_email(db, email=email)
+    db_user = services.get_user_by_email(db, email=email)
     if db_user is None:
         raise credentials_exception
     return db_user
